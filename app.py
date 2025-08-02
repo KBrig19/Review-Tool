@@ -47,7 +47,7 @@ def login_page():
             st.session_state.user_type = user_type
             st.session_state.user_name = (ADMIN_USERS.get(email) or REVIEWER_USERS.get(email))["name"]
             st.success(f"Welcome {st.session_state.user_name}!")
-            st.experimental_rerun()
+            st.stop()
         else:
             st.error("Invalid credentials")
 
