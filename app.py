@@ -55,7 +55,7 @@ if uploaded_file:
         if st.button("Get AI Suggestion"):
             # Call OpenAI using the new v1+ client syntax
             response = client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o",
                 messages=[{"role": "user", "content": prompt}]
             )
             suggestion = response.choices[0].message.content
