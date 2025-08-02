@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import openai
 
-# Replace with your own OpenAI API key
-openai.api_key = 'YOUR_OPENAI_API_KEY'
+# --- SETUP OPENAI CLIENT (v1.0+) ---
+client = openai.OpenAI(api_key='YOUR_OPENAI_API_KEY')
 
 st.title("Data Cleanliness Review App")
 
@@ -53,18 +53,24 @@ if uploaded_file:
         """
 
         if st.button("Get AI Suggestion"):
-            response = openai.ChatCompletion.create(
+            # Call OpenAI using the new v1+ client syntax
+            response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "user", "content": prompt}]
             )
-            suggestion = response['choices'][0]['message']['content']
+            suggestion = response.choices[0].message.content
 
-            # Parse AI response (basic version, feel free to adjust)
-            action = st.text_input("Action", value=suggestion.split("Action:")[1].split("\n")[0].strip() if "Action:" in suggestion else "KEEP")
-            updated_brand = st.text_input("Updated Brand", value=suggestion.split("Updated Brand:")[1].split("\n")[0].strip() if "Updated Brand:" in suggestion else row.get('brand', ''))
-            updated_category = st.text_input("Updated Category", value=suggestion.split("Updated Category:")[1].split("\n")[0].strip() if "Updated Category:" in suggestion else row.get('category', ''))
-            updated_desc = st.text_input("Updated Description", value=suggestion.split("Updated Description:")[1].split("\n")[0].strip() if "Updated Description:" in suggestion else row.get('description', ''))
-            reason = st.text_area("Reason", value=suggestion.split("Reason:")[1].strip() if "Reason:" in suggestion else "")
+            # Basic parse (not bulletproof, just splits by key)
+            def get_value(key):
+                if key in suggestion:
+                    return suggestion.split(f"{key}:")[1].split("\n")[0].strip()
+                return ""
+
+            action = st.text_input("Action", value=get_value("Action") or "KEEP")
+            updated_brand = st.text_input("Updated Brand", value=get_value("Updated Brand") or row.get('brand', ''))
+            updated_category = st.text_input("Updated Category", value=get_value("Updated Category") or row.get('category', ''))
+            updated_desc = st.text_input("Updated Description", value=get_value("Updated Description") or row.get('description', ''))
+            reason = st.text_area("Reason", value=get_value("Reason") or "")
 
             if st.button("Approve & Next"):
                 reviewed = row.to_dict()
