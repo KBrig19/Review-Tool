@@ -3,7 +3,7 @@ import pandas as pd
 import openai
 
 # --- SETUP OPENAI CLIENT (v1.0+) ---
-client = openai.OpenAI(api_key='YOUR_OPENAI_API_KEY')
+client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.title("Data Cleanliness Review App")
 
